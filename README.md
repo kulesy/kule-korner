@@ -1,47 +1,50 @@
-This is a [Tina CMS](https://tina.io/) project.
+# Kule Korner
 
-## Local Development
+A personal blog built with TinaCMS and Next.js. Posts and pages are edited in the browser at `/admin` and saved as Markdown and MDX files in this repo.
 
-Install the project's dependencies:
+## Stack
 
-> [!NOTE]  
-> [Do you know the best package manager for Node.js?](https://www.ssw.com.au/rules/best-package-manager-for-node/) Using the right package manager can greatly enhance your development workflow. We recommend using pnpm for its speed and efficient handling of dependencies. Learn more about why pnpm might be the best choice for your projects by checking out this rule from SSW.
+- Next.js 14 (App Router), React 18 and TypeScript
+- TinaCMS 3, with content stored as files in this repo and TinaCloud as the hosted content API
+- Plain CSS in `app/globals.css`
 
-```
+## Run it locally
+
+Install and start the dev server:
+
+```bash
 pnpm install
-```
-
-Run the project locally:
-
-```
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The site is at http://localhost:3000 and the editor is at http://localhost:3000/admin.
 
-### Building the Starter Locally (Using the hosted content API)
+| Script | What it does |
+|---|---|
+| `pnpm dev` | Runs `tinacms dev` with `next dev`. |
+| `pnpm build` | Runs `tinacms build`, then `next build`. Needs the environment variables below. |
+| `pnpm build-local` | The same build against local content, with indexing and cloud checks skipped. |
+| `pnpm start` | Runs `tinacms build`, then `next start`. |
+| `pnpm lint` | Runs `next lint`. |
 
-Replace the `.env.example`, with `.env`
+## Environment variables
 
-```
-NEXT_PUBLIC_TINA_CLIENT_ID=<get this from the project you create at app.tina.io>
-TINA_TOKEN=<get this from the project you create at app.tina.io>
-NEXT_PUBLIC_TINA_BRANCH=<Specify the branch with Tina configured>
-```
+Copy `.env.example` to `.env` and fill in the values from the project at https://app.tina.io.
 
-Build the project:
+- `NEXT_PUBLIC_TINA_CLIENT_ID`
+- `TINA_TOKEN`
+- `NEXT_PUBLIC_TINA_BRANCH`: the branch Tina reads content from. When unset, `tina/config.js` falls back to `NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF`, then to `HEAD` (set by Netlify).
 
-```bash
-pnpm build
-```
+## Layout
 
-## Learn More
+- `content/page/`: pages as MDX. `home.mdx` is served at `/`.
+- `content/post/`: blog posts as Markdown, served at `/posts/<filename>`.
+- `app/`: the Next.js routes, the layout and the styles.
+- `tina/`: the TinaCMS config and the `page` and `post` collections. `tina/tina-lock.json` is generated and committed, so commit the updated copy after a schema change.
+- `public/uploads/`: media uploaded through Tina.
 
-To learn more about Tina, take a look at the following resources:
+## CI
 
-- [Tina Docs](https://tina.io/docs)
-- [Getting started](https://tina.io/docs/setup-overview/)
+`.github/workflows/pr-open.yml` runs `pnpm build` on every pull request, using the repo secrets `NEXT_PUBLIC_TINA_CLIENT_ID` and `TINA_TOKEN` and the PR branch as the Tina branch. Dependabot checks the `tinacms` and `@tinacms/*` packages daily.
 
-You can check out [Tina Github repository](https://github.com/tinacms/tinacms) - your feedback and contributions are welcome!
-
-## [Deploy on Vercel](https://tina.io/guides/tina-cloud/add-tinacms-to-existing-site/deployment/)
+The repo does not record where the site is deployed. It has no Vercel or Netlify config file.
